@@ -52,14 +52,18 @@ class ThreadActivity : AppCompatActivity()  {
                     sleep(1000)
                     t++
                     counterText.post { counterText.text = t.toString() }
+                    if (isInterrupted) {
+                        val intCounter = sharedPref!!.getInt("inter", 0)
+
+                        val ed = sharedPref!!.edit()
+                        ed.putInt("counter", t)
+                        ed.putInt("inter", intCounter + 1)
+                        ed.apply()
+                        break
+                    }
                 }
             } catch (e: InterruptedException) {
-                val intCounter = sharedPref!!.getInt("inter", 0)
 
-                val ed = sharedPref!!.edit()
-                ed.putInt("counter", t)
-                ed.putInt("inter", intCounter + 1)
-                ed.apply()
             }
         }
     }

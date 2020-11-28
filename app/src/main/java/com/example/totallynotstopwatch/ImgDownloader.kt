@@ -9,22 +9,26 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.dowmload_activity.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.io.InputStream
 import java.net.URL
 
 
 class ImgDownloader: AppCompatActivity() {
-
+    var asyncTask: DownloadImageTask? = null
+    var corTask: Job? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.dowmload_activity)
         button.setOnClickListener {
-            //DownloadImageTask(imageView2)
-            //    .execute("https://smartminds.ru/wp-content/uploads/2019/12/foto-2-kartinka-s-pozhelaniem-prekrasnogo-nastroeniya-na-ves-den.jpg")
+            asyncTask = DownloadImageTask(imageView2)
+            asyncTask!!.execute("https://smartminds.ru/wp-content/uploads/2019/12/foto-2-kartinka-s-pozhelaniem-prekrasnogo-nastroeniya-na-ves-den.jpg")
 
-            //runCoroutine()
+            corTask = runCoroutine()
 
             Picasso.with(this)
                 .load("https://smartminds.ru/wp-content/uploads/2019/12/foto-2-kartinka-s-pozhelaniem-prekrasnogo-nastroeniya-na-ves-den.jpg")
@@ -32,7 +36,13 @@ class ImgDownloader: AppCompatActivity() {
                 .error(R.drawable.ic_launcher_background)
                 .into(imageView2);
         }
+    }
 
+    override fun onStop() {
+        super.onStop()
+
+        //asyncTask!!.cancel(true)
+        //corTask!!.cancel()
     }
 
     inner class DownloadImageTask(var bmImage: ImageView) : AsyncTask<String?, Void?, Bitmap?>() {
@@ -58,8 +68,8 @@ class ImgDownloader: AppCompatActivity() {
         }
     }
 
-    fun runCoroutine() {
-        GlobalScope.launch {
+    fun runCoroutine(): Job {
+        return GlobalScope.launch(Dispatchers.IO) {
             val urldisplay = "https://smartminds.ru/wp-content/uploads/2019/12/foto-2-kartinka-s-pozhelaniem-prekrasnogo-nastroeniya-na-ves-den.jpg"
             var mIcon11: Bitmap? = null
             try {

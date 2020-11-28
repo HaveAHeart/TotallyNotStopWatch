@@ -40,10 +40,7 @@ class CoroutinesActivity : AppCompatActivity() {
         job.cancel()
     }
 
-    override fun onStop() {
-        super.onStop()
-        job.cancel()
-    }
+
 
     private fun createJob() = GlobalScope.launch {
         job = GlobalScope.launch {
